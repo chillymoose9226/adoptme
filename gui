@@ -1,0 +1,563 @@
+-- Adopt Me Script 2025 GUI
+-- By: @notcrazy0006
+
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AdoptMeScript2025"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 350, 0, 220)
+mainFrame.Position = UDim2.new(0.5, -175, 0.5, -110)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+-- RGB Border
+local border = Instance.new("UIStroke")
+border.Color = Color3.fromRGB(255, 0, 0)
+border.Thickness = 3
+border.Parent = mainFrame
+
+-- RGB Animation for Border
+task.spawn(function()
+    local hue = 0
+    while true do
+        hue = hue + 1
+        if hue > 360 then hue = 0 end
+        border.Color = Color3.fromHSV(hue / 360, 1, 1)
+        task.wait(0.03)
+    end
+end)
+
+-- Corner Rounding
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = mainFrame
+
+-- Title Label
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "Title"
+titleLabel.Size = UDim2.new(1, 0, 0, 45)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.Text = "Adopt Me Script 2025"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 24
+titleLabel.Font = Enum.Font.Fantasy
+titleLabel.Parent = mainFrame
+
+-- Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -38, 0, 8)
+closeButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 18
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = mainFrame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 6)
+closeCorner.Parent = closeButton
+
+-- Activate Button
+local activateButton = Instance.new("TextButton")
+activateButton.Name = "ActivateButton"
+activateButton.Size = UDim2.new(0, 140, 0, 38)
+activateButton.Position = UDim2.new(0, 20, 0, 60)
+activateButton.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+activateButton.Text = "Activate"
+activateButton.TextColor3 = Color3.fromRGB(30, 30, 30)
+activateButton.TextSize = 17
+activateButton.Font = Enum.Font.GothamBold
+activateButton.Parent = mainFrame
+
+local activateCorner = Instance.new("UICorner")
+activateCorner.CornerRadius = UDim.new(0, 8)
+activateCorner.Parent = activateButton
+
+-- Disable Button
+local disableButton = Instance.new("TextButton")
+disableButton.Name = "DisableButton"
+disableButton.Size = UDim2.new(0, 140, 0, 38)
+disableButton.Position = UDim2.new(1, -160, 0, 60)
+disableButton.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+disableButton.Text = "Disable"
+disableButton.TextColor3 = Color3.fromRGB(30, 30, 30)
+disableButton.TextSize = 17
+disableButton.Font = Enum.Font.GothamBold
+disableButton.Parent = mainFrame
+
+local disableCorner = Instance.new("UICorner")
+disableCorner.CornerRadius = UDim.new(0, 8)
+disableCorner.Parent = disableButton
+
+-- Anti-Banned Bypass Button
+local bypassButton = Instance.new("TextButton")
+bypassButton.Name = "BypassButton"
+bypassButton.Size = UDim2.new(0, 310, 0, 38)
+bypassButton.Position = UDim2.new(0.5, -155, 0, 115)
+bypassButton.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+bypassButton.Text = "Anti-Banned Bypass"
+bypassButton.TextColor3 = Color3.fromRGB(30, 30, 30)
+bypassButton.TextSize = 17
+bypassButton.Font = Enum.Font.GothamBold
+bypassButton.Parent = mainFrame
+
+local bypassCorner = Instance.new("UICorner")
+bypassCorner.CornerRadius = UDim.new(0, 8)
+bypassCorner.Parent = bypassButton
+
+-- Credit Label
+local creditLabel = Instance.new("TextLabel")
+creditLabel.Name = "Credit"
+creditLabel.Size = UDim2.new(1, 0, 0, 30)
+creditLabel.Position = UDim2.new(0, 0, 1, -35)
+creditLabel.BackgroundTransparency = 1
+creditLabel.Text = "By: @zovlanexd"
+creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+creditLabel.TextSize = 15
+creditLabel.Font = Enum.Font.Gotham
+creditLabel.Parent = mainFrame
+
+-- Notification System with Stacking
+local notificationOffset = 0
+local activeNotifications = {}
+
+local function showNotification(title, message, iconType)
+    -- Calculate position for new notification (stack above existing ones)
+    local yPosition = 1
+    local yOffset = -90 - notificationOffset
+    
+    -- Create notification frame
+    local notifFrame = Instance.new("Frame")
+    notifFrame.Name = "NotificationFrame"
+    notifFrame.Size = UDim2.new(0, 340, 0, 75)
+    notifFrame.Position = UDim2.new(1, -360, yPosition, yOffset)
+    notifFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    notifFrame.BorderSizePixel = 0
+    notifFrame.ZIndex = 9999
+    notifFrame.Parent = screenGui
+    
+    -- Track this notification
+    table.insert(activeNotifications, notifFrame)
+    notificationOffset = notificationOffset + 85
+    
+    -- Corner rounding
+    local notifCorner = Instance.new("UICorner")
+    notifCorner.CornerRadius = UDim.new(0, 8)
+    notifCorner.Parent = notifFrame
+    
+    -- Shadow effect
+    local notifStroke = Instance.new("UIStroke")
+    notifStroke.Color = Color3.fromRGB(0, 0, 0)
+    notifStroke.Thickness = 2
+    notifStroke.Transparency = 0.5
+    notifStroke.Parent = notifFrame
+    
+    -- Close button for notification (optional - notification auto-closes after 3 seconds)
+    local notifCloseBtn = Instance.new("TextButton")
+    notifCloseBtn.Name = "CloseButton"
+    notifCloseBtn.Size = UDim2.new(0, 22, 0, 22)
+    notifCloseBtn.Position = UDim2.new(1, -26, 0, 4)
+    notifCloseBtn.BackgroundTransparency = 1
+    notifCloseBtn.Text = "×"
+    notifCloseBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+    notifCloseBtn.TextSize = 16
+    notifCloseBtn.Font = Enum.Font.GothamBold
+    notifCloseBtn.ZIndex = 9999
+    notifCloseBtn.Parent = notifFrame
+    
+    -- Icon with different types
+    local iconColor, iconSymbol, glowColor
+    if iconType == "success" or iconType == "activate" then
+        iconColor = Color3.fromRGB(50, 200, 50)
+        glowColor = Color3.fromRGB(50, 200, 50)
+        iconSymbol = "✓"
+    elseif iconType == "disable" then
+        iconColor = Color3.fromRGB(220, 60, 60)
+        glowColor = Color3.fromRGB(220, 60, 60)
+        iconSymbol = "X"
+    elseif iconType == "shield" or iconType == "protection" then
+        iconColor = Color3.fromRGB(60, 150, 255)
+        glowColor = Color3.fromRGB(60, 150, 255)
+        iconSymbol = "⚡"
+    else
+        iconColor = Color3.fromRGB(50, 200, 50)
+        glowColor = Color3.fromRGB(50, 200, 50)
+        iconSymbol = "✓"
+    end
+    
+    local iconFrame = Instance.new("Frame")
+    iconFrame.Name = "IconFrame"
+    iconFrame.Size = UDim2.new(0, 42, 0, 42)
+    iconFrame.Position = UDim2.new(0, 12, 0.5, -21)
+    iconFrame.BackgroundColor3 = iconColor
+    iconFrame.BorderSizePixel = 0
+    iconFrame.ZIndex = 9999
+    iconFrame.Parent = notifFrame
+    
+    local iconCorner = Instance.new("UICorner")
+    iconCorner.CornerRadius = UDim.new(1, 0)
+    iconCorner.Parent = iconFrame
+    
+    -- Glow effect for icon
+    local iconGlow = Instance.new("UIStroke")
+    iconGlow.Color = glowColor
+    iconGlow.Thickness = 3
+    iconGlow.Transparency = 0.3
+    iconGlow.Parent = iconFrame
+    
+    -- Icon symbol
+    local iconLabel = Instance.new("TextLabel")
+    iconLabel.Size = UDim2.new(1, 0, 1, 0)
+    iconLabel.BackgroundTransparency = 1
+    iconLabel.Text = iconSymbol
+    iconLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    iconLabel.TextSize = 26
+    iconLabel.Font = Enum.Font.SourceSansBold
+    iconLabel.ZIndex = 9999
+    iconLabel.Parent = iconFrame
+    
+    -- Title text
+    local titleText = Instance.new("TextLabel")
+    titleText.Size = UDim2.new(0, 260, 0, 24)
+    titleText.Position = UDim2.new(0, 62, 0, 10)
+    titleText.BackgroundTransparency = 1
+    titleText.Text = title
+    titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleText.TextSize = 16
+    titleText.Font = Enum.Font.GothamBold
+    titleText.TextXAlignment = Enum.TextXAlignment.Left
+    titleText.TextYAlignment = Enum.TextYAlignment.Top
+    titleText.ZIndex = 9999
+    titleText.Parent = notifFrame
+    
+    -- Message text
+    local messageLabel = Instance.new("TextLabel")
+    messageLabel.Name = "Message"
+    messageLabel.Size = UDim2.new(0, 260, 0, 30)
+    messageLabel.Position = UDim2.new(0, 62, 0, 36)
+    messageLabel.BackgroundTransparency = 1
+    messageLabel.Text = message
+    messageLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    messageLabel.TextSize = 13
+    messageLabel.Font = Enum.Font.Gotham
+    messageLabel.TextWrapped = true
+    messageLabel.TextXAlignment = Enum.TextXAlignment.Left
+    messageLabel.TextYAlignment = Enum.TextYAlignment.Top
+    messageLabel.TextTruncate = Enum.TextTruncate.AtEnd
+    messageLabel.ZIndex = 9999
+    messageLabel.Parent = notifFrame
+    
+    -- Progress bar/white line at the bottom (countdown indicator)
+    local progressBar = Instance.new("Frame")
+    progressBar.Name = "ProgressBar"
+    progressBar.Size = UDim2.new(1, 0, 0, 2)
+    progressBar.Position = UDim2.new(0, 0, 1, -2)
+    progressBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    progressBar.BorderSizePixel = 0
+    progressBar.ZIndex = 9999
+    progressBar.Parent = notifFrame
+    
+    -- Close button hover effect
+    notifCloseBtn.MouseEnter:Connect(function()
+        notifCloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end)
+    
+    notifCloseBtn.MouseLeave:Connect(function()
+        notifCloseBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+    end)
+    
+    -- Close button functionality
+    notifCloseBtn.MouseButton1Click:Connect(function()
+        local closeTween = TweenService:Create(notifFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+            Position = UDim2.new(1, 20, yPosition, yOffset)
+        })
+        closeTween:Play()
+        closeTween.Completed:Wait()
+        
+        -- Remove from active notifications and adjust offset
+        for i, notif in ipairs(activeNotifications) do
+            if notif == notifFrame then
+                table.remove(activeNotifications, i)
+                notificationOffset = notificationOffset - 85
+                break
+            end
+        end
+        
+        notifFrame:Destroy()
+    end)
+    
+    -- Opening animation (slide in from right)
+    notifFrame.Position = UDim2.new(1, 20, yPosition, yOffset)
+    local openNotif = TweenService:Create(notifFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+        Position = UDim2.new(1, -360, yPosition, yOffset)
+    })
+    openNotif:Play()
+    
+    -- Progress bar animation (countdown from 3 seconds)
+    local progressTween = TweenService:Create(progressBar, TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 0, 0, 2)
+    })
+    progressTween:Play()
+    
+    -- Auto-close after 3 seconds (slide out to right)
+    task.delay(3, function()
+        if notifFrame and notifFrame.Parent then
+            local closeTween = TweenService:Create(notifFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+                Position = UDim2.new(1, 20, yPosition, yOffset)
+            })
+            closeTween:Play()
+            closeTween.Completed:Wait()
+            
+            -- Remove from active notifications and adjust offset
+            for i, notif in ipairs(activeNotifications) do
+                if notif == notifFrame then
+                    table.remove(activeNotifications, i)
+                    notificationOffset = notificationOffset - 85
+                    break
+                end
+            end
+            
+            notifFrame:Destroy()
+        end
+    end)
+end
+
+-- Button Hover Effects
+local function createHoverEffect(button)
+    local originalColor = button.BackgroundColor3
+    local hoverColor = Color3.fromRGB(200, 200, 200)
+    
+    button.MouseEnter:Connect(function()
+        local tween = TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor})
+        tween:Play()
+    end)
+    
+    button.MouseLeave:Connect(function()
+        local tween = TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = originalColor})
+        tween:Play()
+    end)
+end
+
+-- Apply hover effects
+createHoverEffect(activateButton)
+createHoverEffect(disableButton)
+createHoverEffect(bypassButton)
+
+-- Close button hover effect (different color)
+closeButton.MouseEnter:Connect(function()
+    local tween = TweenService:Create(closeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(180, 60, 60)})
+    tween:Play()
+end)
+
+closeButton.MouseLeave:Connect(function()
+    local tween = TweenService:Create(closeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)})
+    tween:Play()
+end)
+
+-- Minimize/Restore Functionality
+local isMinimized = false
+
+-- Create minimized bar that appears when GUI is minimized
+local minimizedBar = Instance.new("Frame")
+minimizedBar.Name = "MinimizedBar"
+minimizedBar.Size = UDim2.new(0, 300, 0, 40)
+minimizedBar.Position = UDim2.new(0.5, -150, 0, 20)
+minimizedBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+minimizedBar.BorderSizePixel = 0
+minimizedBar.Visible = false
+minimizedBar.Active = true
+minimizedBar.Draggable = true
+minimizedBar.ZIndex = 50
+minimizedBar.Parent = screenGui
+
+-- Rounded corners for minimized bar
+local minBarCorner = Instance.new("UICorner")
+minBarCorner.CornerRadius = UDim.new(0, 12)
+minBarCorner.Parent = minimizedBar
+
+-- RGB Border for minimized bar
+local minBarBorder = Instance.new("UIStroke")
+minBarBorder.Color = Color3.fromRGB(255, 0, 0)
+minBarBorder.Thickness = 2
+minBarBorder.Parent = minimizedBar
+
+-- RGB Animation for minimized bar border
+task.spawn(function()
+    local hue = 0
+    while true do
+        hue = hue + 1
+        if hue > 360 then hue = 0 end
+        if minimizedBar.Visible then
+            minBarBorder.Color = Color3.fromHSV(hue / 360, 1, 1)
+        end
+        task.wait(0.03)
+    end
+end)
+
+-- Title text in minimized bar
+local minBarTitle = Instance.new("TextLabel")
+minBarTitle.Size = UDim2.new(1, -50, 1, 0)
+minBarTitle.Position = UDim2.new(0, 15, 0, 0)
+minBarTitle.BackgroundTransparency = 1
+minBarTitle.Text = "Adopt Me Script 2025"
+minBarTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+minBarTitle.TextSize = 16
+minBarTitle.Font = Enum.Font.Fantasy
+minBarTitle.TextXAlignment = Enum.TextXAlignment.Left
+minBarTitle.ZIndex = 51
+minBarTitle.Parent = minimizedBar
+
+-- Restore button (X) in minimized bar
+local minBarRestoreBtn = Instance.new("TextButton")
+minBarRestoreBtn.Name = "RestoreButton"
+minBarRestoreBtn.Size = UDim2.new(0, 28, 0, 28)
+minBarRestoreBtn.Position = UDim2.new(1, -34, 0.5, -14)
+minBarRestoreBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+minBarRestoreBtn.Text = "X"
+minBarRestoreBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+minBarRestoreBtn.TextSize = 16
+minBarRestoreBtn.Font = Enum.Font.GothamBold
+minBarRestoreBtn.ZIndex = 52
+minBarRestoreBtn.Parent = minimizedBar
+
+local minBarRestoreCorner = Instance.new("UICorner")
+minBarRestoreCorner.CornerRadius = UDim.new(0, 6)
+minBarRestoreCorner.Parent = minBarRestoreBtn
+
+-- Hover effect for restore button
+minBarRestoreBtn.MouseEnter:Connect(function()
+    local tween = TweenService:Create(minBarRestoreBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)})
+    tween:Play()
+end)
+
+minBarRestoreBtn.MouseLeave:Connect(function()
+    local tween = TweenService:Create(minBarRestoreBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(70, 70, 70)})
+    tween:Play()
+end)
+
+-- Close/Minimize Button Functionality
+closeButton.MouseButton1Click:Connect(function()
+    if not isMinimized then
+        isMinimized = true
+        -- Minimize animation
+        local minimizeTween = TweenService:Create(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0)
+        })
+        minimizeTween:Play()
+        minimizeTween.Completed:Wait()
+        mainFrame.Visible = false
+        
+        -- Show minimized bar
+        minimizedBar.Visible = true
+        minimizedBar.Size = UDim2.new(0, 0, 0, 40)
+        local barAppear = TweenService:Create(minimizedBar, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 300, 0, 40)
+        })
+        barAppear:Play()
+    end
+end)
+
+-- Restore functionality
+local function restoreGUI()
+    if isMinimized then
+        isMinimized = false
+        -- Hide minimized bar
+        local hideBarTween = TweenService:Create(minimizedBar, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 40)
+        })
+        hideBarTween:Play()
+        hideBarTween.Completed:Wait()
+        minimizedBar.Visible = false
+        
+        -- Show and restore main frame
+        mainFrame.Visible = true
+        local restoreTween = TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 350, 0, 220)
+        })
+        restoreTween:Play()
+    end
+end
+
+-- Restore when clicking X button on minimized bar
+minBarRestoreBtn.MouseButton1Click:Connect(function()
+    restoreGUI()
+end)
+
+-- Restore when clicking anywhere on the minimized bar (except the X button)
+minBarTitle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        restoreGUI()
+    end
+end)
+
+-- Activate Button Functionality
+local isActivated = false
+activateButton.MouseButton1Click:Connect(function()
+    isActivated = true
+    print("Script Activated!")
+    -- Add your activation code here
+    
+    -- Visual feedback - change to green and stay green
+    local colorTween = TweenService:Create(activateButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundColor3 = Color3.fromRGB(80, 220, 80)
+    })
+    colorTween:Play()
+    
+    -- Show notification
+    showNotification("Activate Success!", "Trade Scam Script Has Been Activated", "activate")
+end)
+
+-- Disable Button Functionality
+disableButton.MouseButton1Click:Connect(function()
+    isActivated = false
+    print("Script Disabled!")
+    -- Add your disable code here
+    
+    -- Visual feedback - change to red and stay red
+    local colorTween = TweenService:Create(disableButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+    })
+    colorTween:Play()
+    
+    -- Show notification
+    showNotification("Disable Success!", "Trade Scam Script Has Been Disabled", "disable")
+end)
+
+-- Anti-Banned Bypass Button Functionality
+bypassButton.MouseButton1Click:Connect(function()
+    print("Anti-Banned Bypass Activated!")
+    -- Add your anti-ban bypass code here
+    
+    -- Visual feedback - change to blue and stay blue
+    local colorTween = TweenService:Create(bypassButton, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundColor3 = Color3.fromRGB(80, 160, 255)
+    })
+    colorTween:Play()
+    
+    -- Show notification
+    showNotification("Anti-Banned Success!", "Anti-Banned Protection Has Been Activated / Your Account Is Safe Now", "protection")
+end)
+
+-- Opening Animation
+mainFrame.Size = UDim2.new(0, 0, 0, 0)
+local openTween = TweenService:Create(mainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = UDim2.new(0, 350, 0, 220)
+})
+openTween:Play()
+
+print("Adopt Me Script 2025 GUI Loaded Successfully!")
